@@ -1,9 +1,12 @@
 <?php
-namespace AmphiBee\ThumbnailOnDemand\Medias;
+
+declare(strict_types=1);
+
+namespace AmphiBee\ThumbnailOnDemand\Facades;
 
 class ImageSizeHelper
 {
-    public static function getSizeData(int|string|array $size): array|null
+    public static function getSizeData(int|string|array $size): ?array
     {
         if (is_array($size)) {
             $sizeData['width'] = $size[0];

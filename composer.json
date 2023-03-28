@@ -2,17 +2,20 @@
     "name": "amphibee/thumbnail-on-demand",
     "description": "Generate thumbnails on demand",
     "type": "wordpress-plugin",
-    "license": "GPL 3.0+",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "AmphiBee",
+            "email": "contact@amphibee.fr"
+        }
+    ],
+    "require": {
+        "php": ">=8.0"
+    },
     "autoload": {
         "psr-4": {
             "AmphiBee\\ThumbnailOnDemand\\": "src/"
         }
     },
-    "authors": [
-        {
-            "name": "AmphiBee"
-        }
-    ],
-    "minimum-stability": "stable",
-    "require": {}
+    "minimum-stability": "stable"
 }

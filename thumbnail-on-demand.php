@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Thumbnail on demand
  *
@@ -6,7 +7,7 @@
  *
  * @link      https://amphibee.fr
  *
- * @copyright 2019-2022 AmphiBee
+ * @copyright 2019-2023 AmphiBee
  *
  * @wordpress-plugin
  * Plugin Name:  Thumbnail On Demand
@@ -19,12 +20,13 @@
  * License URI:  https://www.gnu.org/licenses/gpl-3.0.html
  */
 
-// setup plugin activator and deactivator
-use AmphiBee\ThumbnailOnDemand\Medias\Resizer;
+declare(strict_types=1);
 
-include dirname(__FILE__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+use AmphiBee\ThumbnailOnDemand\Providers\ResizerEventHandlers;
+
+require dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 register_activation_hook(__FILE__, 'flush_rewrite_rules');
 register_deactivation_hook(__FILE__, 'flush_rewrite_rules');
 
-new Resizer();
+new ResizerEventHandlers();

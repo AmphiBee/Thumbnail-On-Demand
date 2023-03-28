@@ -1,13 +1,24 @@
 <?php
-namespace AmphiBee\ThumbnailOnDemand\Medias;
+
+declare(strict_types=1);
+
+namespace AmphiBee\ThumbnailOnDemand\Providers;
+
+use AmphiBee\ThumbnailOnDemand\Facades\ImageSizeHelper;
 
 class ResizerEventHandlers
 {
     public function __construct()
     {
-        add_filter('intermediate_image_sizes_advanced', [$this, 'disableAutoResize'], 10);
-        add_filter('image_size_names_choose', [$this, 'disableNameChoose'], 10);
-        add_filter('image_downsize', [$this, 'resizeEvent'], 10, 3);
+        add_filter('intermediate_image_sizes_advanced', function (array $sizes) : array {
+            return $this->disableAutoResize($sizes);
+        }, 10);
+        add_filter('image_size_names_choose', function (array $names) : array {
+            return $this::disableNameChoose($names);
+        }, 10);
+        add_filter('image_downsize', function ($downsize, int $id, int|string|array $size) : bool|array {
+            return $this->resizeEvent($downsize, $id, $size);
+        }, 10, 3);
     }
 
     public static function disableNameChoose(array $names): array

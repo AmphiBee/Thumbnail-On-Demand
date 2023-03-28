@@ -1,9 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 namespace AmphiBee\ThumbnailOnDemand\Medias;
 
 class ResizedImage
 {
+    protected int $id;
     protected string $file;
+    protected string $fileUrl;
     protected int $width;
     protected int $height;
     protected string $mimeType;
@@ -12,10 +17,12 @@ class ResizedImage
     /**
      * @return array
      */
-    public function getMetaDatas()
+    public function getMetaData(): array
     {
         return [
+            'id' => $this->id,
             'file' => $this->file,
+            'fileUrl' => $this->fileUrl,
             'width' => $this->width,
             'height' => $this->height,
             'mimeType' => $this->mimeType,
@@ -23,9 +30,11 @@ class ResizedImage
         ];
     }
 
-    public function __construct(string $file, int $width, int $height, string $mimeType, int $filesize)
+    public function __construct(int $id, string $file, string $fileUrl, int $width, int $height, string $mimeType, int $filesize)
     {
+        $this->id = $id;
         $this->file = $file;
+        $this->fileUrl = $fileUrl;
         $this->width = $width;
         $this->height = $height;
         $this->mimeType = $mimeType;

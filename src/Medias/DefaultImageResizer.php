@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AmphiBee\ThumbnailOnDemand\Medias;
 
-use AmphiBee\ThumbnailOnDemand\Contract\ImageResizerInterface;
+use AmphiBee\ThumbnailOnDemand\Contracts\ImageResizerInterface;
 
 class DefaultImageResizer implements ImageResizerInterface
 {
@@ -19,13 +21,27 @@ class DefaultImageResizer implements ImageResizerInterface
         $this->crop = $crop;
     }
 
-    public function resize(): array|bool
+    public function resize(): ResizedImage|bool
     {
-        return image_make_intermediate_size(
+        $resized = image_make_intermediate_size(
             get_attached_file($this->id),
             $this->width,
             $this->height,
             $this->crop
+        );
+
+        if (false === $resized) {
+            return false;
+        }
+
+        return new ResizedImage(
+            $this->id,
+            $resized['file'],
+            dirname(wp_get_attachment_url($this->id)) . '/' . $resized['file'],
+            $resized['width'],
+            $resized['height'],
+            $resized['mime-type'],
+            $resized['filesize']
         );
     }
 }
