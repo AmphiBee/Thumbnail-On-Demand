@@ -66,18 +66,25 @@ class ResizerEventHandlers
         $registeredSizes = wp_get_registered_image_subsizes();
         $sizeData = $registeredSizes[$sizeName];
 
-        // Create the "srcset" by searching for high-res sizes
-        $highResolutionPattern = '/^'.preg_quote($sizeName, '/').'@[1-9]+(\\.[0-9]+)?x$/';
+        $imageResizerClass = (defined('IMAGE_RESIZER_CLASS') && is_subclass_of(IMAGE_RESIZER_CLASS, ImageResizerInterface::class)) ? IMAGE_RESIZER_CLASS : '\\AmphiBee\\ThumbnailOnDemand\\Medias\\GrafikaImageResizer';
 
-        $imageResizerClass = (defined('IMAGE_RESIZER_CLASS') && is_subclass_of(IMAGE_RESIZER_CLASS, ImageResizerInterface::class)) ? IMAGE_RESIZER_CLASS : '\\AmphiBee\\ThumbnailOnDemand\\Medias\\DefaultImageResizer';
-
+        $resizer = new Resizer($id);
+        $sizes = $resizer->getImageMetadata()['sizes'];
         foreach ($registeredSizes as $subName => $subData) {
-            if (! isset(Resizer::getImageMetadata()['sizes'][$subName]) && preg_match($highResolutionPattern, $subName)) {
-                Resizer::resize($id, $subName, $subData, $imageResizerClass);
+            if (!isset($sizes[$subName])) {
+                $resizer->resize($subName, $subData, $imageResizerClass);
             }
         }
 
-        // resize the main thumbnail requested
-        return Resizer::resize($id, $sizeName, $sizeData, $imageResizerClass);
+        if (isset($sizes[$sizeName])) {
+            return [
+                $sizes[$sizeName]['fileUrl'],
+                $sizes[$sizeName]['width'],
+                $sizes[$sizeName]['height'],
+                $sizes[$sizeName]['crop'],
+            ];
+        }
+
+        return $resizer->resize($sizeName, $sizeData, $imageResizerClass);
     }
 }

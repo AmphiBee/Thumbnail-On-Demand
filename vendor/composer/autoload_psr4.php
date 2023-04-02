@@ -6,5 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Grafika\\' => array($vendorDir . '/kosinix/grafika/src/Grafika'),
     'AmphiBee\\ThumbnailOnDemand\\' => array($baseDir . '/src'),
 );

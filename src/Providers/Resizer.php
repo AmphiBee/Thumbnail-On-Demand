@@ -8,42 +8,62 @@ use AmphiBee\ThumbnailOnDemand\Contract\ImageResizerInterface;
 
 class Resizer
 {
-    protected static array|bool $imageMetaData = [];
+    public function __construct(protected int $id) {}
 
-    public static function getImageMetadata(): array
+    public function getImageMetadata(): bool|array
     {
-        return self::$imageMetaData;
+        return wp_get_attachment_metadata($this->id);
     }
 
-    public static function resize(
-        int    $id,
+    public function resize(
         string $sizeName,
-        array  $sizeData,
+        array $sizeData,
         string $imageResizerClass
     ): array|bool {
-        $resizedImage = (new $imageResizerClass(
-            $id,
+        $imageMetaData = $this->getImageMetadata();
+
+        $dims = image_resize_dimensions(
+            $imageMetaData['width'],
+            $imageMetaData['height'],
             $sizeData['width'],
             $sizeData['height'],
             $sizeData['crop']
+        );
+
+        $finalDims = [
+            'width' => $dims ? $dims[4] : $sizeData['width'],
+            'height' => $dims ? $dims[5] : $sizeData['height'],
+        ];
+
+        $imageFile = get_attached_file($this->id);
+
+        if (!file_exists($imageFile)) {
+            return false;
+        }
+
+        $resizedImage = (new $imageResizerClass(
+            $this->id,
+            $imageFile,
+            $sizeData['width'],
+            $sizeData['height'],
+            $sizeData['crop'],
+            $finalDims['width'],
+            $finalDims['height'],
+            $imageMetaData
         ))->resize();
 
         if (false === $resizedImage) {
             return false;
         }
 
-
-        self::$imageMetaData = wp_get_attachment_metadata($id);
         $resizedImageMetaData = $resizedImage->getMetaData();
 
-        self::$imageMetaData['sizes'][$sizeName] = array_intersect_key($resizedImageMetaData, [
-            'file' => true,
-            'width' => true,
-            'height' => true,
-            'crop' => true,
-        ]);
+        $imageMetaData['sizes'][$sizeName] = array_merge(
+            array_intersect_key($resizedImageMetaData, array_flip(['file', 'width', 'height'])),
+            ['fileUrl' => $resizedImageMetaData['fileUrl']]
+        );
 
-        wp_update_attachment_metadata($id, self::$imageMetaData);
+        wp_update_attachment_metadata($this->id, $imageMetaData);
 
         return [
             $resizedImageMetaData['fileUrl'],

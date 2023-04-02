@@ -4,29 +4,27 @@ declare(strict_types=1);
 
 namespace AmphiBee\ThumbnailOnDemand\Medias;
 
-use AmphiBee\ThumbnailOnDemand\Contracts\ImageResizerInterface;
-
-class DefaultImageResizer implements ImageResizerInterface
+class DefaultImageResizer extends AbstractImageResizer
 {
-    protected int $id;
-    protected int $width;
-    protected int $height;
-    protected bool $crop;
-
-    public function __construct(int $id, int $width, int $height, bool $crop)
-    {
-        $this->id = $id;
-        $this->width = $width;
-        $this->height = $height;
-        $this->crop = $crop;
+    public function __construct(
+        protected int $id,
+        protected string $imageFile,
+        protected int $maxWidth,
+        protected int $maxHeight,
+        protected bool $crop,
+        protected int $resizedWidth,
+        protected int $resizedHeight,
+        protected array $imageMetadatas
+    ) {
+        //
     }
 
     public function resize(): ResizedImage|bool
     {
         $resized = image_make_intermediate_size(
-            get_attached_file($this->id),
-            $this->width,
-            $this->height,
+            $this->imageFile,
+            $this->maxWidth,
+            $this->maxHeight,
             $this->crop
         );
 

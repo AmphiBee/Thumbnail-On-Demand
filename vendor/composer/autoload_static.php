@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit5d5746e95916214476cb187509d8add5
 {
     public static $prefixLengthsPsr4 = array (
+        'G' => 
+        array (
+            'Grafika\\' => 8,
+        ),
         'A' => 
         array (
             'AmphiBee\\ThumbnailOnDemand\\' => 27,
@@ -14,6 +18,10 @@ class ComposerStaticInit5d5746e95916214476cb187509d8add5
     );
 
     public static $prefixDirsPsr4 = array (
+        'Grafika\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kosinix/grafika/src/Grafika',
+        ),
         'AmphiBee\\ThumbnailOnDemand\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
