@@ -81,7 +81,7 @@ class ResizerEventHandlers
                 $sizes[$sizeName]['fileUrl'],
                 $sizes[$sizeName]['width'],
                 $sizes[$sizeName]['height'],
-                $sizes[$sizeName]['crop'],
+                $sizes[$sizeName]['crop'] ?? false,
             ];
         }
 
