@@ -61,8 +61,12 @@ class ResizerEventHandlers
         return $this->collectImages($id, $size);
     }
 
-    protected function collectImages(int $id, string $sizeName): bool|array
+    protected function collectImages(int $id, int|string|array $sizeName): bool|array
     {
+        if (is_array($sizeName)) {
+            $sizeName = implode('x', $sizeName);
+        }
+        
         $registeredSizes = wp_get_registered_image_subsizes();
         $sizeData = $registeredSizes[$sizeName];
 
@@ -76,7 +80,7 @@ class ResizerEventHandlers
             }
         }
 
-        if (isset($sizes[$sizeName])) {
+        if (isset($sizes[$sizeName]) && isset($sizes[$sizeName]['fileUrl'])) {
             return [
                 $sizes[$sizeName]['fileUrl'],
                 $sizes[$sizeName]['width'],
