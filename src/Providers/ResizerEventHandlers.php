@@ -16,7 +16,7 @@ class ResizerEventHandlers
         add_filter('image_size_names_choose', function (array $names) : array {
             return $this::disableNameChoose($names);
         }, 10);
-        add_filter('image_downsize', function ($downsize, int $id, int|string|array $size) : bool|array {
+        add_filter('image_downsize', function ($downsize, int|string|array $id, int|string|array $size) : bool|array {
             return $this->resizeEvent($downsize, $id, $size);
         }, 10, 3);
     }
@@ -47,7 +47,7 @@ class ResizerEventHandlers
         return $sizes;
     }
 
-    public function resizeEvent($downsize, int $id, int|string|array $size): bool|array
+    public function resizeEvent($downsize, int|string|array $id, int|string|array $size): bool|array
     {
         if (false !== $downsize) {
             return $downsize;
@@ -61,12 +61,12 @@ class ResizerEventHandlers
         return $this->collectImages($id, $size);
     }
 
-    protected function collectImages(int $id, int|string|array $sizeName): bool|array
+    protected function collectImages(int|string|array $id, int|string|array $sizeName): bool|array
     {
         if (is_array($sizeName)) {
             $sizeName = implode('x', $sizeName);
         }
-        
+
         $registeredSizes = wp_get_registered_image_subsizes();
         $sizeData = $registeredSizes[$sizeName];
 

@@ -8,7 +8,7 @@ use AmphiBee\ThumbnailOnDemand\Contract\ImageResizerInterface;
 
 class Resizer
 {
-    public function __construct(protected int $id) {}
+    public function __construct(protected int|string|array $id) {}
 
     public function getImageMetadata(): bool|array
     {
