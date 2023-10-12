@@ -40,7 +40,7 @@ class GrafikaImageResizer extends AbstractImageResizer
             $imageFileSuffix = "-{$this->maxWidth}x{$this->maxHeight}" . ($this->crop ? '-cropped' : '');
 
             if ($this->crop) {
-                $this->editor->crop($resized, $this->resizedWidth, $this->resizedHeight, 'smart');
+                $this->editor->resizeFit($resized, $this->resizedWidth, $this->resizedHeight);
             } elseif ($this->resizedHeight === 0) {
                 $this->editor->resizeExactWidth($resized, $this->resizedWidth);
             } elseif ($this->resizedWidth === 0) {
