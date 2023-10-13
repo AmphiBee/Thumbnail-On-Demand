@@ -47,7 +47,7 @@ class ResizerEventHandlers
         return $sizes;
     }
 
-    public function resizeEvent($downsize, int|string|array $id, int|string|array $size): bool|array
+    public function resizeEvent($downsize, int|string $id, int|string|array $size): bool|array
     {
         if ($downsize !== false) {
             return $downsize;
@@ -58,10 +58,10 @@ class ResizerEventHandlers
             return false;
         }
 
-        return $this->collectImages($id, $size);
+        return $this->collectImages((int) $id, $size);
     }
 
-    protected function collectImages(int|string|array $id, int|string|array $sizeName): bool|array
+    protected function collectImages(int $id, int|string|array $sizeName): bool|array
     {
         if (is_array($sizeName)) {
             $sizeName = implode('x', $sizeName);
@@ -70,7 +70,7 @@ class ResizerEventHandlers
         $registeredSizes = wp_get_registered_image_subsizes();
         $sizeData = $registeredSizes[$sizeName];
 
-        $imageResizerClass = (defined('IMAGE_RESIZER_CLASS') && is_subclass_of(IMAGE_RESIZER_CLASS, ImageResizerInterface::class)) ? IMAGE_RESIZER_CLASS : '\\AmphiBee\\ThumbnailOnDemand\\Medias\\GrafikaImageResizer';
+        $imageResizerClass = (defined('IMAGE_RESIZER_CLASS') && is_subclass_of(IMAGE_RESIZER_CLASS, ImageResizerInterface::class)) ? IMAGE_RESIZER_CLASS : '\\AmphiBee\\ThumbnailOnDemand\\Medias\\SpatieImageResizer';
 
         $resizer = new Resizer($id);
         $imageMetadata = $resizer->getImageMetadata();

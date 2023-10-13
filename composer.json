@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": ">=8.0",
-        "kosinix/grafika": "^2.0"
+        "spatie/image": "^2.2",
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {

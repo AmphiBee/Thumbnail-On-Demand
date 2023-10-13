@@ -10,7 +10,7 @@ class Resizer
 
     protected $metadatas;
 
-    public function __construct(protected int|string|array $id)
+    public function __construct(protected int|string $id)
     {
     }
 
