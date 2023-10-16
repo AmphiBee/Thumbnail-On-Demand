@@ -5,7 +5,7 @@
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '5aa00d3bb43b3f898e49c4ed42331e0a47b649fb',
+        'reference' => '35fb928014776428803ff991182cb81e88d5979e',
         'name' => 'amphibee/thumbnail-on-demand',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '5aa00d3bb43b3f898e49c4ed42331e0a47b649fb',
+            'reference' => '35fb928014776428803ff991182cb81e88d5979e',
             'dev_requirement' => false,
         ),
         'guzzlehttp/psr7' => array(
