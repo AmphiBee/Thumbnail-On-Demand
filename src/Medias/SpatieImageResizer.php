@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace AmphiBee\ThumbnailOnDemand\Medias;
@@ -10,6 +9,7 @@ use Spatie\Image\Manipulations;
 class SpatieImageResizer extends AbstractImageResizer
 {
     protected $editor;
+    protected string $imageDriver;
 
     public function __construct(
         protected int $id,
@@ -21,25 +21,16 @@ class SpatieImageResizer extends AbstractImageResizer
         protected int $resizedHeight,
         protected array $imageMetadatas
     ) {
+        $this->imageDriver = $this->chooseImageDriver();
     }
 
     public function resize(): ResizedImage|bool
     {
         try {
-
-            /*
-            $imageType = $this->guessType($this->imageFile);
-            if ($imageType === '') {
-                return $this->fallbackResize(
-                    $this->id, $this->imageFile, $this->maxWidth, $this->maxHeight, $this->crop,
-                    $this->resizedWidth, $this->resizedHeight, $this->imageMetadatas
-                );
-            }
-*/
             $imageFolder = dirname($this->imageFile);
             $imageFileSuffix = "-{$this->maxWidth}x{$this->maxHeight}".($this->crop ? '-cropped' : '');
 
-            $image = Image::load($this->imageFile);
+            $image = Image::useImageDriver($this->imageDriver)->load($this->imageFile);
             if ($this->crop) {
                 $image->crop(Manipulations::CROP_CENTER, $this->resizedWidth, $this->resizedHeight);
             } else {
@@ -52,34 +43,7 @@ class SpatieImageResizer extends AbstractImageResizer
 
             $image->save($imagePath);
 
-            $thumbnail = Image::load($imagePath);
-
-
-            /*
-                        $this->editor->open($resized, $this->imageFile);
-                        $imageFolder = dirname($this->imageFile);
-                        $imageFileSuffix = "-{$this->maxWidth}x{$this->maxHeight}" . ($this->crop ? '-cropped' : '');
-
-                        if ($this->crop) {
-                            //$this->editor->resizeFit($resized, $this->resizedWidth, $this->resizedHeight);
-                            $this->editor->crop($resized, $this->resizedWidth, $this->resizedHeight);
-                        } elseif ($this->resizedHeight === 0) {
-                            $this->editor->resizeExactWidth($resized, $this->resizedWidth);
-                        } elseif ($this->resizedWidth === 0) {
-                            $this->editor->resizeExactHeight($resized, $this->resizedHeight);
-                        } else {
-                            $this->editor->resize($resized, $this->resizedWidth, $this->resizedHeight);
-                        }
-                        if ($this->crop) {
-                            //$this->editor->crop($resized, $this->resizedWidth, $this->resizedHeight);
-                        }
-
-                        $imageFilenameParts = pathinfo($this->imageFile);
-                        $imageFilename = $imageFilenameParts['filename'] . $imageFileSuffix . '.' . $imageFilenameParts['extension'];
-                        $imagePath = $imageFolder . DIRECTORY_SEPARATOR . $imageFilename;
-
-                        $this->editor->save($resized, $imagePath);
-            */
+            $thumbnail = Image::useImageDriver($this->imageDriver)->load($imagePath);
 
             return new ResizedImage(
                 $this->id,
@@ -106,5 +70,16 @@ class SpatieImageResizer extends AbstractImageResizer
             15 => ImageType::WBMP,
             default => '',
         };
+    }
+
+    private function chooseImageDriver(): string
+    {
+        if (extension_loaded('imagick')) {
+            return 'imagick';
+        } elseif (extension_loaded('gd')) {
+            return 'gd';
+        } else {
+            throw new \Exception('No suitable image driver available (Imagick or GD)');
+        }
     }
 }
