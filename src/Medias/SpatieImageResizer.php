@@ -30,7 +30,7 @@ class SpatieImageResizer extends AbstractImageResizer
             $imageFolder = dirname($this->imageFile);
             $imageFileSuffix = "-{$this->maxWidth}x{$this->maxHeight}".($this->crop ? '-cropped' : '');
 
-            $image = Image::useImageDriver($this->imageDriver)->load($this->imageFile);
+            $image = Image::load($this->imageFile)->useImageDriver($this->imageDriver);
             if ($this->crop) {
                 $image->crop(Manipulations::CROP_CENTER, $this->resizedWidth, $this->resizedHeight);
             } else {
@@ -43,7 +43,7 @@ class SpatieImageResizer extends AbstractImageResizer
 
             $image->save($imagePath);
 
-            $thumbnail = Image::useImageDriver($this->imageDriver)->load($imagePath);
+            $thumbnail = Image::load($imagePath)->useImageDriver($this->imageDriver);
 
             return new ResizedImage(
                 $this->id,
