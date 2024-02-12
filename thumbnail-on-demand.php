@@ -13,7 +13,7 @@
  * Plugin Name:  Thumbnail On Demand
  * Plugin URI:   https://amphibee.fr
  * Description:  Generate thumbnails on demand
- * Version:      1.3
+ * Version:      1.3.4
  * Author:       AmphiBee
  * Author URI:   https://amphibee.fr
  * License:      GPL-3.0-or-later

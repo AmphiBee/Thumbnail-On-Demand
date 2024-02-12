@@ -10,15 +10,9 @@ class ResizerEventHandlers
 {
     public function __construct()
     {
-        add_filter('intermediate_image_sizes_advanced', function (array $sizes): array {
-            return $this->disableAutoResize($sizes);
-        }, 10);
-        add_filter('image_size_names_choose', function (array $names): array {
-            return $this::disableNameChoose($names);
-        }, 10);
-        add_filter('image_downsize', function ($downsize, int|string|array $id, int|string|array $size): bool|array {
-            return $this->resizeEvent($downsize, $id, $size);
-        }, 10, 3);
+        add_filter('intermediate_image_sizes_advanced', fn (array $sizes): array => $this->disableAutoResize($sizes), 10);
+        add_filter('image_size_names_choose', fn (array $names): array => self::disableNameChoose($names), 10);
+        add_filter('image_downsize', fn ($downsize, int|string $id, int|string|array $size): bool|array => ((int) $id) > 0 ? $this->resizeEvent($downsize, (int) $id, $size) : $downsize, 10, 3);
     }
 
     public static function disableNameChoose(array $names): array
@@ -77,6 +71,13 @@ class ResizerEventHandlers
 
         if (! isset($imageMetadata['sizes'])) {
             $imageMetadata = $resizer->generateMetadatas();
+        }
+
+        if (! isset($imageMetadata['sizes'])) {
+            echo '<pre>';
+            var_dump($id);
+            var_dump($imageMetadata);
+            exit();
         }
         $sizes = $imageMetadata['sizes'];
         foreach ($registeredSizes as $subName => $subData) {
