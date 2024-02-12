@@ -73,12 +73,6 @@ class ResizerEventHandlers
             $imageMetadata = $resizer->generateMetadatas();
         }
 
-        if (! isset($imageMetadata['sizes'])) {
-            echo '<pre>';
-            var_dump($id);
-            var_dump($imageMetadata);
-            exit();
-        }
         $sizes = $imageMetadata['sizes'];
         foreach ($registeredSizes as $subName => $subData) {
             if (! isset($sizes[$subName])) {
