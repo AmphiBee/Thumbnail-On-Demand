@@ -8,7 +8,11 @@ use AmphiBee\ThumbnailOnDemand\Contract\ImageResizerInterface;
 
 class Resizer
 {
-    public function __construct(protected int|string|array $id) {}
+    public function __construct(protected int|string|array $id) {
+        if (!file_exists('wp_get_attachment_metadata')) {
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+        }
+    }
 
     public function getImageMetadata(): bool|array
     {
