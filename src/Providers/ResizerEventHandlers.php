@@ -10,15 +10,9 @@ class ResizerEventHandlers
 {
     public function __construct()
     {
-        add_filter('intermediate_image_sizes_advanced', function (array $sizes) : array {
-            return $this->disableAutoResize($sizes);
-        }, 10);
-        add_filter('image_size_names_choose', function (array $names) : array {
-            return $this::disableNameChoose($names);
-        }, 10);
-        add_filter('image_downsize', function ($downsize, int|string|array $id, int|string|array $size) : bool|array {
-            return $this->resizeEvent($downsize, $id, $size);
-        }, 10, 3);
+        add_filter('intermediate_image_sizes_advanced', fn (array $sizes): array => $this->disableAutoResize($sizes), 10);
+        add_filter('image_size_names_choose', fn (array $names): array => self::disableNameChoose($names), 10);
+        add_filter('image_downsize', fn ($downsize, int|string $id, int|string|array $size): bool|array => ((int) $id) > 0 ? $this->resizeEvent($downsize, (int) $id, $size) : $downsize, 10, 3);
     }
 
     public static function disableNameChoose(array $names): array
@@ -47,9 +41,9 @@ class ResizerEventHandlers
         return $sizes;
     }
 
-    public function resizeEvent($downsize, int|string|array $id, int|string|array $size): bool|array
+    public function resizeEvent($downsize, int|string $id, int|string|array $size): bool|array
     {
-        if (false !== $downsize) {
+        if ($downsize !== false) {
             return $downsize;
         }
 
@@ -58,10 +52,10 @@ class ResizerEventHandlers
             return false;
         }
 
-        return $this->collectImages($id, $size);
+        return $this->collectImages((int) $id, $size);
     }
 
-    protected function collectImages(int|string|array $id, int|string|array $sizeName): bool|array
+    protected function collectImages(int $id, int|string|array $sizeName): bool|array
     {
         if (is_array($sizeName)) {
             $sizeName = implode('x', $sizeName);
@@ -70,17 +64,23 @@ class ResizerEventHandlers
         $registeredSizes = wp_get_registered_image_subsizes();
         $sizeData = $registeredSizes[$sizeName];
 
-        $imageResizerClass = (defined('IMAGE_RESIZER_CLASS') && is_subclass_of(IMAGE_RESIZER_CLASS, ImageResizerInterface::class)) ? IMAGE_RESIZER_CLASS : '\\AmphiBee\\ThumbnailOnDemand\\Medias\\GrafikaImageResizer';
+        $imageResizerClass = (defined('IMAGE_RESIZER_CLASS') && is_subclass_of(IMAGE_RESIZER_CLASS, ImageResizerInterface::class)) ? IMAGE_RESIZER_CLASS : '\\AmphiBee\\ThumbnailOnDemand\\Medias\\SpatieImageResizer';
 
         $resizer = new Resizer($id);
-        $sizes = $resizer->getImageMetadata()['sizes'];
+        $imageMetadata = $resizer->getImageMetadata();
+
+        if (! isset($imageMetadata['sizes'])) {
+            $imageMetadata = $resizer->generateMetadatas();
+        }
+
+        $sizes = $imageMetadata['sizes'];
         foreach ($registeredSizes as $subName => $subData) {
-            if (!isset($sizes[$subName])) {
+            if (! isset($sizes[$subName])) {
                 $resizer->resize($subName, $subData, $imageResizerClass);
             }
         }
 
-        if (isset($sizes[$sizeName]) && isset($sizes[$sizeName]['fileUrl'])) {
+        if (isset($sizes[$sizeName]['fileUrl'])) {
             return [
                 $sizes[$sizeName]['fileUrl'],
                 $sizes[$sizeName]['width'],

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace AmphiBee\ThumbnailOnDemand\Providers;
 
-use AmphiBee\ThumbnailOnDemand\Contract\ImageResizerInterface;
-
 class Resizer
 {
-    public function __construct(protected int|string|array $id) {
+    protected $file;
+
+    protected $metadatas;
+
+    public function __construct(protected int|string $id)
+    {
         if (!file_exists('wp_get_attachment_metadata')) {
             require_once(ABSPATH . 'wp-admin/includes/image.php');
         }
@@ -19,12 +22,21 @@ class Resizer
         return wp_get_attachment_metadata($this->id);
     }
 
+    public function generateMetadatas()
+    {
+        $this->file = get_attached_file($this->id);
+        $this->metadatas = wp_generate_attachment_metadata($this->id, $this->file);
+        wp_update_attachment_metadata($this->id, $this->metadatas);
+
+        return $this->metadatas;
+    }
+
     public function resize(
         string $sizeName,
         array $sizeData,
         string $imageResizerClass
     ): array|bool {
-        $imageMetaData = $this->getImageMetadata();
+        $imageMetaData = $this->metadatas ?: $this->getImageMetadata();
 
         $dims = image_resize_dimensions(
             $imageMetaData['width'],
@@ -39,9 +51,9 @@ class Resizer
             'height' => $dims ? $dims[5] : $sizeData['height'],
         ];
 
-        $imageFile = get_attached_file($this->id);
+        $imageFile = $this->file ?: get_attached_file($this->id);
 
-        if (!file_exists($imageFile)) {
+        if (! file_exists($imageFile)) {
             return false;
         }
 
@@ -56,7 +68,7 @@ class Resizer
             $imageMetaData
         ))->resize();
 
-        if (false === $resizedImage) {
+        if ($resizedImage === false) {
             return false;
         }
 
@@ -73,7 +85,7 @@ class Resizer
             $resizedImageMetaData['fileUrl'],
             $resizedImageMetaData['width'],
             $resizedImageMetaData['height'],
-            true
+            true,
         ];
     }
 }
